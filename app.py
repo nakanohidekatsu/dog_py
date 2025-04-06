@@ -11,6 +11,7 @@ from db_control.create_tables_MySQL import init_db
 from dotenv import load_dotenv
 from openai import OpenAI
 
+"""
 # # アプリケーション初期化時にテーブルを作成
 init_db()
 
@@ -243,3 +244,5 @@ def delete_customer(customer_id: str = Query(...)):
 def fetchtest():
     response = requests.get('https://jsonplaceholder.typicode.com/users')
     return response.json()
+
+"""
