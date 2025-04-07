@@ -28,6 +28,7 @@ class Sales(BaseModel):
     city: str
     sicName: str
     simcName: str
+"""
 
 app = FastAPI()
 
@@ -40,6 +41,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+"""
 ####  nakano add Start  ####
 # .envファイルを読み込む
 load_dotenv()
