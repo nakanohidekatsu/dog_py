@@ -7,7 +7,6 @@ from sqlalchemy import create_engine, insert, delete, update, select
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 import json
-import pandas as pd
 
 from db_control.connect_MySQL import engine
 from db_control.mymodels_MySQL import Customers
@@ -115,7 +114,7 @@ def soundselect(mymodel, sound_id):
                 "music_type_code": music_tbl.music_type_code,
                 "music_data": str(music_tbl.music_data),
                 "title": music_tbl.title,
-                "duration": music_tbl.duration,
+                "duration": str(music_tbl.duration),
             })
         # リストをJSONに変換
         result_json = json.dumps(result_dict_list, ensure_ascii=False)

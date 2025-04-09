@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 import os
 # uname() error回避
 import platform
-print("platform:", platform.uname())
+print("nakano:platform:", platform.uname())
 
 
 main_path = os.path.dirname(os.path.abspath(__file__))

@@ -38,8 +38,8 @@ class history_tbl(Base):
     mood: Mapped[int] = mapped_column(Integer)
     title: Mapped[str] = mapped_column(String(200))
     
-class sound_tbl(Base):
-    __tablename__ = 'sound_tbl'
+class music_tbl(Base):
+    __tablename__ = 'music_tbl'
     sound_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer)
     dog_id: Mapped[int] = mapped_column(Integer)
