@@ -41,106 +41,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-"""
-####  nakano add Start  ####
-# .envファイルを読み込む
-load_dotenv()
-
-client = OpenAI()
-
-###　●●●　Local用　　●●●
-# 環境変数からAPIキーを取得
-
-OpenAI.api_key = os.getenv("OPENAI_API_KEY")
-kokudo_api_key = os.getenv("kokudo_API_KEY")
-###　●●●　Host用　　●●●
-# シークレットからAPIキーを取得
-# OpenAI.api_key  = st.secrets["OPENAI_API_KEY"]
-
-def send_request(query: str) -> dict:
-
-    END_POINT: str = "https://www.mlit-data.jp/api/v1/"
-    
-    response: requests.models.Response = requests.post(
-        END_POINT,
-        headers={
-            "Content-type": "application/json",
-            "apikey": kokudo_api_key,
-        },
-        json={"query": query},
-    )
-    result: dict = json.loads(response.content)["data"]
-    return result
-
-query_ken_string = '''
-    query {
-        prefecture {
-            code
-            name
-        }
-    }
-    '''
-
-query_city_string = '''
-    query{
-        municipalities {
-            code
-            prefecture_code
-            name
-        }
-    }
-    '''
-    
-data: dict = send_request(query=query_ken_string)
-df_ken: pd.DataFrame = pd.json_normalize(data["prefecture"])
-df_ken['code_str'] = df_ken['code'].astype(str).str.zfill(2)
-df_ken['codename'] = df_ken['code_str'].str.cat(df_ken['name'], sep=' ')
-
-data: dict = send_request(query=query_city_string)
-df_city: pd.DataFrame = pd.json_normalize(data["municipalities"])
-df_merge= pd.merge(df_ken,df_city,left_on='code',right_on='prefecture_code')
-area_data = df_merge.groupby("codename")["name_y"].apply(list).to_dict()
-
-# データインポート
-df = pd.read_csv("https://www.soumu.go.jp/main_content/000420038.csv", encoding="shift_jis")
-df_dai = df[df['中分類コード']==0];
-df_chu = df[(df['小分類コード']==0) & (df['中分類コード']!=0)];
-df_chu['大分類コード'] =df_chu['大分類コード'].astype(str)
-df_dai['大分類コード'] =df_dai['大分類コード'].astype(str)
-df_dai['codename1']= df_dai['大分類コード'].str.cat(df_dai['項目名'],sep=' ');
-
-df_gyou_join= pd.merge(df_chu,df_dai,on = '大分類コード')
-
-# area_data = df_gyou_join.groupby("codename1")["項目名_y"].apply(list).to_dict()
-industry_data = df_gyou_join.groupby("codename1")["項目名_x"].apply(list).to_dict()
-
-# nakano add End
-
 @app.get("/")
 def index():
     return {"message": "FastAPI top page!"}
 
-@app.post("/customers")
-def create_customer(customer: Customer):
-    print("nakano create_customer")
-    values = customer.dict()
-    
-    # add nakano Start
-    tmp_id = values.get("customer_id")
-    if tmp_id == '':
-        return None
-        raise HTTPException(status_code=404, detail="Customer not create")
-    # add nakano End
-    
-    tmp = crud.myinsert(mymodels_MySQL.Customers, values)
-    result = crud.myselect(mymodels_MySQL.Customers, values.get("customer_id"))
 
+@app.get("/profile")
+def read_dog_profile(dog_id: str = Query(...)):
+    result = crud.dogselect(mymodels_MySQL.profile, dog_id)
     if not result:
-        raise HTTPException(status_code=404, detail="Customer not create")
+        raise HTTPException(status_code=404, detail="Dog_profile not found")
     result_obj = json.loads(result)
     return result_obj[0] if result_obj else None
-#    return None
 
+@app.get("/recommend_misic")
+def read_recommend_misic(dog_id: str = Query(...)):
+    result = crud.historyselect(mymodels_MySQL.history_tbl, dog_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="history_tbl not found")
+    result_obj = json.loads(result)
+    return result_obj[0] if result_obj else None
+
+@app.get("/get_misic")
+def read_music_tbl(souund_id: str = Query(...)):
+    result = crud.soundselect(mymodels_MySQL.music_tbl, souund_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="souund_id not found")
+    result_obj = json.loads(result)
+    return result_obj[0] if result_obj else None
+
+"""
 @app.get("/customers")
 def read_one_customer(customer_id: str = Query(...)):
     result = crud.myselect(mymodels_MySQL.Customers, customer_id)
