@@ -10,6 +10,11 @@ from db_control import crud, mymodels_MySQL
 from db_control.create_tables_MySQL import init_db
 from dotenv import load_dotenv
 
+##　nakano add start
+import base64
+from fastapi.responses import Response
+##　nakano add end
+
 """
 # # アプリケーション初期化時にテーブルを作成
 init_db()
@@ -48,11 +53,31 @@ def read_recommend_misic(dog_id: str = Query(...)):
     result_obj = json.loads(result)
     return result_obj[0] if result_obj else None
 
+## add nakano_start
+
 @app.get("/get_misic")
 def read_music_tbl(souund_id: str = Query(...)):
-    result = crud.soundselect(mymodels_MySQL.music_tbl, souund_id)
+    try:
+        sound_id_int = int(souund_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid sound_id")
+
+    result = crud.soundselect(mymodels_MySQL.music_tbl, sound_id_int)
     if not result:
         raise HTTPException(status_code=404, detail="souund_id not found")
+
     result_obj = json.loads(result)
-    return result_obj[0] if result_obj else None
+    if not result_obj:
+        raise HTTPException(status_code=404, detail="souund_id not found")
+
+    music_data_base64 = result_obj[0]["music_data"]
+    try:
+        music_data_bytes = base64.b64decode(music_data_base64)
+    except Exception as e:
+        logger.error(f"Base64 decode error: {e}")
+        raise HTTPException(status_code=500, detail="音声データのデコードに失敗しました")
+
+    return Response(content=music_data_bytes, media_type="audio/mpeg")
+
+## add nakano_end
 

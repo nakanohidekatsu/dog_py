@@ -10,6 +10,7 @@ import json
 
 from db_control.connect_MySQL import engine
 from db_control.mymodels_MySQL import Customers
+import base64  #nakano add
 
 def myinsert(mymodel, values):
     # session構築
@@ -112,7 +113,9 @@ def soundselect(mymodel, sound_id):
                 "user_id": music_tbl.user_id,
                 "dog_id": music_tbl.dog_id,
                 "music_type_code": music_tbl.music_type_code,
-                "music_data": str(music_tbl.music_data),
+                ## nakano_sart
+                "music_data": base64.b64encode(music_tbl.music_data).decode('utf-8'),
+                ## nakano_end
                 "title": music_tbl.title,
                 "duration": str(music_tbl.duration),
             })
