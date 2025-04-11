@@ -36,6 +36,9 @@ app.add_middleware(
 def index():
     return {"message": "FastAPI top page!"}
 
+@app.get("/numbers")
+def get_numbers():
+    return [1, 5, 10, 15, 20]
 
 @app.get("/profile")
 def read_dog_profile(dog_id: str = Query(...)):
